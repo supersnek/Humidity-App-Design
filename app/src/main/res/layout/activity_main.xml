@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    tools:context=".MainActivity">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintGuide_percent="0.5"
+        android:layout_marginEnd="0dp"
+        android:layout_marginStart="0dp" />
+
+    <com.ksondzyk.humidity.CurveSeekView
+        android:id="@+id/curveSeekView"
+        android:layout_width="168dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    </com.ksondzyk.humidity.CurveSeekView>
+
+    <TextView
+        android:id="@+id/temperatureLabelTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/return_temperature"
+        android:textColor="@color/secondaryText"
+        android:textAllCaps="true"
+        android:fontFamily="sans-serif-light"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/temperatureTextView"
+        app:layout_constraintStart_toEndOf="@id/curveSeekView"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/temperatureTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20°C"
+        android:textColor="@color/primaryText"
+        android:textSize="26sp"
+        android:textAllCaps="true"
+        android:fontFamily="sans-serif-black"
+        android:layout_marginTop="8dp"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintTop_toBottomOf="@id/temperatureLabelTextView"
+        app:layout_constraintBottom_toTopOf="@+id/humidityLabelTextView"
+        app:layout_constraintStart_toStartOf="@id/temperatureLabelTextView"
+        tools:ignore="HardcodedText" />
+
+    <TextView
+        android:id="@+id/humidityLabelTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/current_humidity"
+        android:textColor="@color/secondaryText"
+        android:textAllCaps="true"
+        android:fontFamily="sans-serif-light"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:clipChildren="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintTop_toBottomOf="@id/temperatureTextView"
+        app:layout_constraintBottom_toTopOf="@id/humidityTextView"
+        app:layout_constraintStart_toStartOf="@id/temperatureLabelTextView"/>
+
+    <com.ksondzyk.humidity.ProgressLabelView
+        android:id="@+id/humidityTextView"
+        android:layout_width="0dp"
+        android:layout_height="72dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintTop_toBottomOf="@id/humidityLabelTextView"
+        app:layout_constraintBottom_toTopOf="@id/absoluteHumidityLabelTextView"
+        app:layout_constraintStart_toStartOf="@id/temperatureLabelTextView"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+
+    <TextView
+        android:id="@+id/absoluteHumidityLabelTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/current_humidity"
+        android:textColor="@color/secondaryText"
+        android:textAllCaps="true"
+        android:fontFamily="sans-serif-light"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintTop_toBottomOf="@id/humidityTextView"
+        app:layout_constraintBottom_toTopOf="@id/absoluteHumidityTextView"
+        app:layout_constraintStart_toStartOf="@id/temperatureLabelTextView"/>
+
+    <TextView
+        android:id="@+id/absoluteHumidityTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="4gr/ft3"
+        android:textColor="@color/primaryText"
+        android:textSize="26sp"
+        android:fontFamily="sans-serif-black"
+        android:layout_marginTop="8dp"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintBottom_toTopOf="@id/warningImageView"
+        app:layout_constraintTop_toBottomOf="@id/absoluteHumidityLabelTextView"
+        app:layout_constraintStart_toStartOf="@id/temperatureLabelTextView"
+        tools:ignore="HardcodedText" />
+
+    <ImageView
+        android:id="@+id/warningImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        app:srcCompat="@drawable/ic_warning"
+        android:tint="@color/warningColor"
+        android:contentDescription="@null"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintBottom_toTopOf="@id/warningTextView"
+        app:layout_constraintTop_toBottomOf="@id/absoluteHumidityTextView"
+        app:layout_constraintStart_toStartOf="@id/temperatureLabelTextView"/>
+
+    <TextView
+        android:id="@+id/warningTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textColor="@color/warningText"
+        android:textSize="12sp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:layout_constraintTop_toBottomOf="@id/warningImageView"
+        app:layout_constraintStart_toStartOf="@id/temperatureLabelTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

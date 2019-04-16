@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Humidity</string>
+    <string name="return_temperature">Return temperature</string>
+    <string name="current_humidity">Current humidity</string>
+    <string name="warning_message"><![CDATA[<font color=#F9DA0A>•</font> - extreme humidity levels.
+Use precaution for set-points outside of 30%-80%]]></string>
+</resources>
