@@ -11,6 +11,10 @@
     <color name="scaleColor">#33ffffff</color>
     <color name="background">#04062C</color>
     <color name="divider">#1Affffff</color>
+    <color name="pink">#FC969E</color>
     <color name="white">#ffffffff</color>
+    <color name="blueLight">#6671E6</color>
+    <color name="blueDark">#433A7F</color>
+    <color name="blueDarkAlpha">#90433A7F</color>
 </resources>
 

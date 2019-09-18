@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="primaryTextColor" format="reference" />
+    <attr name="secondaryTextColor" format="reference" />
+    <attr name="warningTextColor" format="reference" />
+    <attr name="backgroundColor" format="reference" />
+    <attr name="selectedLabelColor" format="reference" />
+    <attr name="labelColor" format="reference" />
+    <attr name="sliderColor" format="reference" />
+    <attr name="sliderIconColor" format="reference" />
+    <attr name="scaleColor" format="reference" />
+    <attr name="firstGradientColor" format="reference" />
+    <attr name="secondGradientColor" format="reference" />
+</resources>

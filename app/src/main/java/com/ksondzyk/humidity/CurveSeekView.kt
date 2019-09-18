@@ -9,24 +9,56 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.animation.DecelerateInterpolator
+import kotlin.math.abs
 
-data class BezierCurve(var c0: Float = 0.0F, var c1: Float = 0.0F, var c2: Float = 0.0F, var c3: Float = 0.0F)
-data class ProgressData(val maxY: Float, val minY: Float, val maxProgress: Float, val minProgress: Float)
+data class BezierCurve(
+    var c0: Float = 0.0F,
+    var c1: Float = 0.0F,
+    var c2: Float = 0.0F,
+    var c3: Float = 0.0F
+)
+
+data class ProgressData(
+    val maxY: Float,
+    val minY: Float,
+    val maxProgress: Float,
+    val minProgress: Float
+)
+
 data class Range(val start: Float, val end: Float)
 
 class CurveSeekView @JvmOverloads constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
+    var backgroundShadowColor = context.getColorCompat(R.color.background)
+        set(value) {
+            field = value
+            invalidate()
+        }
+
     //Curve
-    private val firstGradientColor = context.getColorCompat(R.color.colorAccent)
-    private val secondGradientColor = context.getColorCompat(R.color.secondaryAccent)
+    var firstGradientColor = context.getColorCompat(R.color.colorAccent)
+        set(value) {
+            field = value
+            invalidate()
+        }
+    var secondGradientColor = context.getColorCompat(R.color.secondaryAccent)
+        set(value) {
+            field = value
+            invalidate()
+        }
     private val optimalPercentageStart = 0.3F
     private val optimalPercentageEnd = 0.7F
     private val curveStrokeWidth = 4F.toPx()
 
     //Scale
-    private val scaleColor = context.getColorCompat(R.color.scaleColor)
+    var scaleColor = context.getColorCompat(R.color.scaleColor)
+        set(value) {
+            field = value
+            scalePaint.color = value
+            invalidate()
+        }
     private val scalePaddingVertical = 72.0F.toPx()
     private val scalePaddingHorizontal = 8F.toPx()
     private val bigLineWidth = 20F.toPx()
@@ -36,15 +68,35 @@ class CurveSeekView @JvmOverloads constructor(
     private val linesCount = bigLineCount + 5 * bigLineCount
 
     //Slider
-    private val sliderColor = context.getColorCompat(R.color.white)
-    private val sliderDrawable = context.getDrawableCompat(R.drawable.ic_slider)
+    var sliderColor = context.getColorCompat(R.color.white)
+        set(value) {
+            field = value
+            circlePaint.color = value
+            invalidate()
+        }
+    private var sliderDrawable = context.getDrawableCompat(R.drawable.ic_slider)
+    var sliderIconColor = context.getColorCompat(R.color.white)
+        set(value) {
+            field = value
+
+            sliderDrawable?.colorFilter = PorterDuffColorFilter(value, PorterDuff.Mode.SRC_IN)
+            invalidate()
+        }
     private val sliderCirclePadding = 12F.toPx()
     private val sliderTouchArea = 32F.toPx()
     private val sliderCircleRadius = 16F.toPx()
 
     //Label
-    private val selectedLabelColor = context.getColorCompat(R.color.colorAccent)
-    private val labelColor = context.getColorCompat(R.color.white)
+    var selectedLabelColor = context.getColorCompat(R.color.colorAccent)
+        set(value) {
+            field = value
+            invalidate()
+        }
+    var labelColor = context.getColorCompat(R.color.white)
+        set(value) {
+            field = value
+            invalidate()
+        }
     private val selectedLabelTextSize = 28F.toPx()
     private val labelTextSize = 18F.toPx()
     private val labelPaddingVertical = 4F.toPx()
@@ -77,11 +129,16 @@ class CurveSeekView @JvmOverloads constructor(
 
     var onProgressChangeListener: ((progress: Float) -> Unit)? = null
 
-
     private val gradientLinePaint = Paint().apply {
         style = Paint.Style.STROKE
         isAntiAlias = true
         color = firstGradientColor
+        strokeWidth = this@CurveSeekView.curveStrokeWidth
+    }
+
+    private val shadowGradientLinePaint = Paint().apply {
+        style = Paint.Style.FILL
+        isAntiAlias = true
         strokeWidth = this@CurveSeekView.curveStrokeWidth
     }
 
@@ -109,47 +166,52 @@ class CurveSeekView @JvmOverloads constructor(
         progressX = width - sliderCircleRadius
         val scalePaddingDiv = scalePaddingVertical / h
 
-        gradientLinePaint.shader = LinearGradient(
-                progressX,
-                0.0F,
-                progressX,
-                h.toFloat(),
-                intArrayOf(
-                        secondGradientColor.adjustAlpha(0.0F),
-                        secondGradientColor,
-                        secondGradientColor,
-                        secondGradientColor,
-                        firstGradientColor,
-                        firstGradientColor,
-                        secondGradientColor,
-                        secondGradientColor,
-                        secondGradientColor,
-                        secondGradientColor.adjustAlpha(0.0F)
-                ),
-                floatArrayOf(
-                        0.0F,
-                        scalePaddingDiv,
-                        scalePaddingDiv,
-                        optimalPercentageStart - 0.05F,
-                        optimalPercentageStart + 0.05F,
-                        optimalPercentageEnd - 0.05F,
-                        optimalPercentageEnd + 0.05F,
-                        1.0F - scalePaddingDiv,
-                        1.0F - scalePaddingDiv,
-                        1.0F
-                ),
-                Shader.TileMode.CLAMP
+        shadowGradientLinePaint.shader = LinearGradient(
+            0F,
+            0F,
+            progressX,
+            0F,
+            backgroundShadowColor.adjustAlpha(1F),
+            backgroundShadowColor.adjustAlpha(0.0F),
+            Shader.TileMode.CLAMP
         )
 
-        progressY = if (maxProgress > minProgress) {
-            (((progress - minProgress) / (maxProgress - minProgress)) *
-                    (height - scalePaddingVertical * 2)) + scalePaddingVertical
-        } else {
-            ((1F - (progress - maxProgress) / (minProgress - maxProgress)) *
-                    (height - scalePaddingVertical * 2)) + scalePaddingVertical
-        }
+        gradientLinePaint.shader = LinearGradient(
+            progressX,
+            0.0F,
+            progressX,
+            h.toFloat(),
+            intArrayOf(
+                secondGradientColor.adjustAlpha(0.0F),
+                secondGradientColor,
+                secondGradientColor,
+                secondGradientColor,
+                firstGradientColor,
+                firstGradientColor,
+                secondGradientColor,
+                secondGradientColor,
+                secondGradientColor,
+                secondGradientColor.adjustAlpha(0.0F)
+            ),
+            floatArrayOf(
+                0.0F,
+                scalePaddingDiv,
+                scalePaddingDiv,
+                optimalPercentageStart - 0.05F,
+                optimalPercentageStart + 0.05F,
+                optimalPercentageEnd - 0.05F,
+                optimalPercentageEnd + 0.05F,
+                1.0F - scalePaddingDiv,
+                1.0F - scalePaddingDiv,
+                1.0F
+            ),
+            Shader.TileMode.CLAMP
+        )
 
-        calcPath()
+        progressY = ((1F - (progress - maxProgress) / (minProgress - maxProgress)) *
+                (height - scalePaddingVertical * 2)) + scalePaddingVertical
+
+        calcPaths()
         initLabels()
     }
 
@@ -157,13 +219,19 @@ class CurveSeekView @JvmOverloads constructor(
         super.onDraw(canvas)
 
         canvas?.apply {
-            drawPath(path, gradientLinePaint)
+            gradientLinePaint.style = Paint.Style.FILL
+            gradientLinePaint.alpha = 70
+            drawPath(gradientPath, gradientLinePaint)
+            drawPath(gradientPath, shadowGradientLinePaint)
+            gradientLinePaint.style = Paint.Style.STROKE
+            gradientLinePaint.alpha = 255
+            drawPath(curvePath, gradientLinePaint)
             drawCircle(progressX, progressY, sliderCircleRadius, circlePaint)
             sliderDrawable?.setBounds(
-                    (progressX - sliderCircleRadius).toInt(),
-                    (progressY - sliderCircleRadius).toInt(),
-                    (progressX + sliderCircleRadius).toInt(),
-                    (progressY + sliderCircleRadius).toInt()
+                (progressX - sliderCircleRadius).toInt(),
+                (progressY - sliderCircleRadius).toInt(),
+                (progressX + sliderCircleRadius).toInt(),
+                (progressY + sliderCircleRadius).toInt()
             )
             sliderDrawable?.draw(canvas)
             drawScale()
@@ -179,15 +247,18 @@ class CurveSeekView @JvmOverloads constructor(
             val y = (((height - scalePaddingVertical * 2) / (labelsCount - 1)) * it) +
                     scalePaddingVertical
 
-            Label(y,
-                    selectedLabelColor,
-                    labelColor,
-                    selectedLabelTextSize,
-                    labelTextSize,
-                    ProgressData(height - scalePaddingVertical,
-                            scalePaddingVertical, maxProgress, minProgress),
-                    labelSuffix,
-                    this
+            Label(
+                y,
+                selectedLabelColor,
+                labelColor,
+                selectedLabelTextSize,
+                labelTextSize,
+                ProgressData(
+                    height - scalePaddingVertical,
+                    scalePaddingVertical, maxProgress, minProgress
+                ),
+                labelSuffix,
+                this
             )
         }
         calcLabels()
@@ -210,8 +281,9 @@ class CurveSeekView @JvmOverloads constructor(
                 val bottomY = y + textBounds.height() * 0.5F + labelPaddingVertical
 
                 if (((topFocusY < bottomY && topFocusY > topY) ||
-                                (bottomFocusY > topY && bottomFocusY < bottomY))
-                        && index != labelFocusIndex) {
+                            (bottomFocusY > topY && bottomFocusY < bottomY))
+                    && index != labelFocusIndex
+                ) {
 
                     focusRequestIndex = index
                 }
@@ -243,8 +315,8 @@ class CurveSeekView @JvmOverloads constructor(
         } else {
             var minDiffLabelIndex = 0
             for (i in 1..(labels.lastIndex)) {
-                val dy1 = Math.abs(labels[i].currentY - progressY)
-                val dy2 = Math.abs(labels[minDiffLabelIndex].currentY - progressY)
+                val dy1 = abs(labels[i].currentY - progressY)
+                val dy2 = abs(labels[minDiffLabelIndex].currentY - progressY)
                 if (dy1 < dy2) {
                     minDiffLabelIndex = i
                 }
@@ -264,15 +336,17 @@ class CurveSeekView @JvmOverloads constructor(
             val labelProgress = it.progress * 100.0F
 
             markRanges.find { range -> labelProgress >= range.start && labelProgress <= range.end }
-                    ?.apply {
-                        drawCircle(markPadding, it.currentY, markRadius, markPaint)
-                    }
+                ?.apply {
+                    drawCircle(markPadding, it.currentY, markRadius, markPaint)
+                }
 
-            drawText(it.text,
-                    0,
-                    it.lastCharIndex, labelPadding,
-                    it.currentY - textBounds.centerY(),
-                    it.paint)
+            drawText(
+                it.text,
+                0,
+                it.lastCharIndex, labelPadding,
+                it.currentY - textBounds.centerY(),
+                it.paint
+            )
         }
     }
 
@@ -281,15 +355,28 @@ class CurveSeekView @JvmOverloads constructor(
     private val bezierCurveYEnd = BezierCurve()
     private val bezierCurveXEnd = BezierCurve()
 
-    private val path = Path()
+    private val curvePath = Path()
+    private val gradientPath = Path()
 
-    private fun calcPath() {
+    private fun calcPaths() {
+        calcPath(curvePath)
+
+        calcPath(gradientPath, -curveStrokeWidth * 0.5F + 1F)
+        gradientPath.apply {
+            lineTo(0F, height.toFloat())
+            lineTo(0F, 0F)
+            lineTo(progressX, 0.0F)
+            close()
+        }
+    }
+
+    private fun calcPath(path: Path, shift: Float = 0F) {
         path.apply {
             reset()
-            moveTo(progressX, 0.0F)
-
-            val x = progressX
+            val x = progressX + shift
             val y = progressY
+
+            moveTo(x, 0.0F)
 
             bezierCurveXStart.c0 = x
             bezierCurveYStart.c0 = getEdgeY(true)
@@ -297,27 +384,27 @@ class CurveSeekView @JvmOverloads constructor(
             bezierCurveXStart.c1 = x
             bezierCurveYStart.c1 = curveY1(true)
 
-            bezierCurveXStart.c2 = curveX1()
+            bezierCurveXStart.c2 = curveX1() + shift
             bezierCurveYStart.c2 = curveY2(true)
 
-            bezierCurveXStart.c3 = curveX2()
+            bezierCurveXStart.c3 = curveX2() + shift
             bezierCurveYStart.c3 = y
 
             lineTo(bezierCurveXStart.c0, bezierCurveYStart.c0)
 
             path.cubicTo(
-                    bezierCurveXStart.c1,
-                    bezierCurveYStart.c1,
-                    bezierCurveXStart.c2,
-                    bezierCurveYStart.c2,
-                    bezierCurveXStart.c3,
-                    bezierCurveYStart.c3
+                bezierCurveXStart.c1,
+                bezierCurveYStart.c1,
+                bezierCurveXStart.c2,
+                bezierCurveYStart.c2,
+                bezierCurveXStart.c3,
+                bezierCurveYStart.c3
             )
 
-            bezierCurveXEnd.c0 = curveX2()
+            bezierCurveXEnd.c0 = curveX2() + shift
             bezierCurveYEnd.c0 = y
 
-            bezierCurveXEnd.c1 = curveX1()
+            bezierCurveXEnd.c1 = curveX1() + shift
             bezierCurveYEnd.c1 = curveY2(false)
 
             bezierCurveXEnd.c2 = x
@@ -327,32 +414,32 @@ class CurveSeekView @JvmOverloads constructor(
             bezierCurveYEnd.c3 = getEdgeY(false)
 
             path.cubicTo(
-                    bezierCurveXEnd.c1,
-                    bezierCurveYEnd.c1,
-                    bezierCurveXEnd.c2,
-                    bezierCurveYEnd.c2,
-                    bezierCurveXEnd.c3,
-                    bezierCurveYEnd.c3
+                bezierCurveXEnd.c1,
+                bezierCurveYEnd.c1,
+                bezierCurveXEnd.c2,
+                bezierCurveYEnd.c2,
+                bezierCurveXEnd.c3,
+                bezierCurveYEnd.c3
             )
 
-            lineTo(progressX, height.toFloat())
-
-            moveTo(progressX, height.toFloat())
-
-            close()
+            lineTo(x, height.toFloat())
         }
-
     }
 
     private fun getEdgeY(first: Boolean) = progressY +
             (sliderCircleRadius * 2F + sliderCirclePadding * 2F) * if (first) -1 else +1
 
-    private fun curveX1() = progressX - (sliderCircleRadius * 0.9F + sliderCirclePadding + curveStrokeWidth)
-    private fun curveY1(first: Boolean) = progressY + (sliderCircleRadius * 1.3F) * if (first) -1 else +1
+    private fun curveX1() =
+        progressX - (sliderCircleRadius * 0.9F + sliderCirclePadding + curveStrokeWidth)
+
+    private fun curveY1(first: Boolean) =
+        progressY + (sliderCircleRadius * 1.3F) * if (first) -1 else +1
 
     private fun curveY2(first: Boolean) = progressY +
             (sliderCircleRadius * 1.3F + sliderCirclePadding + curveStrokeWidth) * if (first) -1 else +1
-    private fun curveX2() = progressX - (sliderCircleRadius + sliderCirclePadding + curveStrokeWidth)
+
+    private fun curveX2() =
+        progressX - (sliderCircleRadius + sliderCirclePadding + curveStrokeWidth)
 
     private fun Canvas.drawScale() {
         val scaleSpacing = -scalePaddingHorizontal - curveStrokeWidth * 0.5F
@@ -395,8 +482,10 @@ class CurveSeekView @JvmOverloads constructor(
 
     fun setProgress(newProgress: Float) {
         progress = newProgress
-        updateSeekY((progress / Math.max(maxProgress, minProgress) *
-                (height - scalePaddingVertical * 2)) + scalePaddingVertical)
+        updateSeekY(
+            (progress / maxProgress.coerceAtLeast(minProgress) *
+                    (height - scalePaddingVertical * 2)) + scalePaddingVertical
+        )
     }
 
     private var isSeeking = false
@@ -482,7 +571,7 @@ class CurveSeekView @JvmOverloads constructor(
         }
 
         previousTouchEventTime = System.currentTimeMillis()
-        calcPath()
+        calcPaths()
         calcLabels()
         invalidate()
         progress = getProgress()

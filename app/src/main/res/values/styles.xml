@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+    <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -10,6 +10,40 @@
         <item name="android:textColorSecondary">@color/secondaryText</item>
         <item name="colorControlActivated">@color/colorAccent</item>
         <item name="android:textColor">@color/primaryText</item>
+        <item name="primaryTextColor">@color/primaryText</item>
+        <item name="secondaryTextColor">@color/secondaryText</item>
+        <item name="warningTextColor">@color/warningText</item>
+        <item name="backgroundColor">@color/background</item>
+        <item name="selectedLabelColor">@color/colorAccent</item>
+        <item name="labelColor">@color/white</item>
+        <item name="scaleColor">@color/scaleColor</item>
+        <item name="sliderIconColor">@color/background</item>
+        <item name="sliderColor">@color/white</item>
+        <item name="firstGradientColor">@color/colorAccent</item>
+        <item name="secondGradientColor">@color/secondaryAccent</item>
+    </style>
+
+    <style name="AppTheme.Light" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/secondaryText</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:colorBackground">@color/white</item>
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:textColorPrimary">@color/primaryText</item>
+        <item name="android:textColorSecondary">@color/secondaryText</item>
+        <item name="colorControlActivated">@color/colorAccent</item>
+        <item name="android:textColor">@color/background</item>
+        <item name="primaryTextColor">@color/blueDark</item>
+        <item name="secondaryTextColor">@color/blueDarkAlpha</item>
+        <item name="warningTextColor">@color/blueDark</item>
+        <item name="backgroundColor">@color/white</item>
+        <item name="selectedLabelColor">@color/blueLight</item>
+        <item name="labelColor">@color/blueDark</item>
+        <item name="scaleColor">@color/white</item>
+        <item name="sliderIconColor">@color/white</item>
+        <item name="sliderColor">@color/blueDark</item>
+        <item name="firstGradientColor">@color/pink</item>
+        <item name="secondGradientColor">@color/blueLight</item>
     </style>
 
 </resources>
